@@ -1,0 +1,847 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>마니또 로또번호 카드 - 2025 대주걸즈 송년회</title>
+
+  <!-- ✅ QR 생성 라이브러리(가벼움) -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
+
+  <style>
+    :root{
+      /* ✅ 연말 파티 톤: 버건디 + 샴페인 + 골드 블링 */
+      --burg:#7a1020;         /* 포인트 버건디 */
+      --burg-2:#4b0b15;       /* 딥 버건디 */
+      --plum:#2b0a16;         /* 다크 플럼(배경 깊이) */
+      --champ:#fbf5ef;        /* 샴페인(배경) */
+      --champ-2:#f6eee6;      /* 샴페인(보조) */
+      --gold:#d9b45a;         /* 골드(블링) */
+      --gold-2:#ffe9b3;       /* 라이트 골드(하이라이트) */
+
+      --txt:#1a1220;
+      --muted:#6b5a6b;
+      --line: rgba(122,16,32,.18);
+      --shadow: 0 18px 48px rgba(27,18,32,.14);
+      --radius: 18px;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: "Noto Sans KR", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color:var(--txt);
+      /* 샴페인 배경 + 은은한 골드 글로우 */
+      background:
+        radial-gradient(900px 500px at 20% -10%, rgba(217,180,90,.22), transparent 60%),
+        radial-gradient(800px 600px at 90% 10%, rgba(122,16,32,.16), transparent 60%),
+        linear-gradient(180deg, var(--champ) 0%, var(--champ-2) 55%, #ffffff 100%);
+    }
+
+    .wrap{
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 26px 18px 40px;
+    }
+
+    .top{
+      display:flex;
+      gap:14px;
+      align-items:flex-end;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      margin-bottom: 14px;
+    }
+
+    .title{ line-height: 1.2; }
+    .title h1{
+      margin:0;
+      font-size: clamp(20px, 2.2vw, 28px);
+      letter-spacing:-.02em;
+    }
+    .title p{
+      margin:6px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .modeTag{
+      font-size:12px;
+      color: var(--burg);
+      background: rgba(217,180,90,.16);
+      border: 1px solid rgba(217,180,90,.30);
+      padding: 6px 10px;
+      border-radius: 999px;
+      box-shadow: 0 8px 18px rgba(217,180,90,.12);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 16px;
+    }
+    @media (max-width: 860px){ .grid{ grid-template-columns: 1fr; } }
+
+    .panel{
+      background: rgba(255,255,255,.78);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+    /* 은은한 스파클 배경(패널) */
+    .panel:before{
+      content:"";
+      position:absolute;
+      inset:-40%;
+      background:
+        radial-gradient(circle at 22% 20%, rgba(217,180,90,.18), transparent 40%),
+        radial-gradient(circle at 60% 30%, rgba(122,16,32,.10), transparent 42%),
+        radial-gradient(circle at 80% 80%, rgba(217,180,90,.14), transparent 44%);
+      transform: rotate(10deg);
+      pointer-events:none;
+      opacity:.75;
+    }
+
+    .panel .hd{
+      position:relative;
+      z-index:1;
+      padding: 14px 16px;
+      background:
+        linear-gradient(90deg, rgba(122,16,32,.10), rgba(217,180,90,.16));
+      border-bottom: 1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+    }
+    .hd h2{
+      margin:0;
+      font-size: 15px;
+      letter-spacing:-.01em;
+    }
+    .hd .badge{
+      font-size: 12px;
+      color: var(--burg);
+      background: rgba(122,16,32,.08);
+      border: 1px solid rgba(122,16,32,.16);
+      padding: 6px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .bd{ position:relative; z-index:1; padding: 16px; }
+
+    label{
+      display:block;
+      font-size: 13px;
+      color: var(--muted);
+      margin: 10px 0 6px;
+    }
+    input, textarea{
+      width: 100%;
+      border: 1px solid rgba(122,16,32,.20);
+      background: rgba(255,255,255,.90);
+      border-radius: 12px;
+      padding: 11px 12px;
+      font-size: 15px;
+      outline: none;
+    }
+    textarea{ min-height: 84px; resize: vertical; }
+
+    input:focus, textarea:focus{
+      border-color: rgba(122,16,32,.55);
+      box-shadow: 0 0 0 4px rgba(217,180,90,.18);
+    }
+
+    .nums{
+      display:grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+    }
+    .nums input{
+      text-align:center;
+      font-weight: 800;
+      letter-spacing: .04em;
+      padding: 12px 8px;
+    }
+    @media (max-width: 420px){ .nums{ grid-template-columns: repeat(3, 1fr); } }
+
+    .row{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 520px){ .row{ grid-template-columns: 1fr; } }
+
+    .btns{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+    .btn{
+      border: 0;
+      cursor: pointer;
+      border-radius: 12px;
+      padding: 11px 14px;
+      font-size: 14px;
+      font-weight: 800;
+      transition: transform .06s ease, filter .2s ease;
+      display:inline-flex;
+      gap: 8px;
+      align-items:center;
+    }
+    .btn:active{ transform: translateY(1px); }
+    .btn.primary{
+      color:#fff;
+      /* 버건디 + 골드 느낌 */
+      background: linear-gradient(135deg, var(--burg) 0%, #9b1c33 40%, var(--gold) 140%);
+      box-shadow: 0 12px 26px rgba(122,16,32,.22);
+      position:relative;
+      overflow:hidden;
+    }
+    /* 버튼 블링 글로시 효과 */
+    .btn.primary:before{
+      content:"";
+      position:absolute;
+      inset:-40% -10%;
+      background: linear-gradient(90deg, transparent 10%, rgba(255,255,255,.25) 45%, transparent 70%);
+      transform: rotate(12deg);
+      animation: shimmer 2.8s ease-in-out infinite;
+      pointer-events:none;
+      opacity:.9;
+    }
+    @keyframes shimmer{
+      0%{ transform: translateX(-40%) rotate(12deg); opacity:.15; }
+      50%{ opacity:.35; }
+      100%{ transform: translateX(40%) rotate(12deg); opacity:.15; }
+    }
+
+    .btn.ghost{
+      color: var(--burg);
+      background: rgba(122,16,32,.06);
+      border: 1px solid rgba(122,16,32,.18);
+    }
+    .btn.warn{
+      color:#7a1f1f;
+      background: rgba(239,68,68,.10);
+      border: 1px solid rgba(239,68,68,.18);
+    }
+
+    .hint{
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .error{
+      margin-top: 10px;
+      padding: 10px 12px;
+      background: rgba(239,68,68,.10);
+      border: 1px solid rgba(239,68,68,.18);
+      color: #7a1f1f;
+      border-radius: 12px;
+      font-size: 13px;
+      display:none;
+    }
+    .ok{
+      margin-top: 10px;
+      padding: 10px 12px;
+      background: rgba(34,197,94,.10);
+      border: 1px solid rgba(34,197,94,.18);
+      color: #14532d;
+      border-radius: 12px;
+      font-size: 13px;
+      display:none;
+    }
+
+    /* ✅ 카드(연말 파티 블링) */
+    .card{
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow:hidden;
+      color:#fff;
+
+      /* 버건디+플럼+골드 글로우 */
+      background:
+        radial-gradient(600px 220px at 25% 10%, rgba(255,233,179,.42), transparent 60%),
+        radial-gradient(520px 260px at 85% 20%, rgba(217,180,90,.28), transparent 60%),
+        linear-gradient(135deg, var(--burg-2) 0%, var(--burg) 38%, #2b0a16 78%, #0f0710 110%);
+    }
+
+    /* 블링 스파클 오버레이 */
+    .card:before{
+      content:"";
+      position:absolute;
+      inset:-40%;
+      background:
+        radial-gradient(circle at 18% 22%, rgba(255,233,179,.55), transparent 22%),
+        radial-gradient(circle at 36% 40%, rgba(255,255,255,.30), transparent 18%),
+        radial-gradient(circle at 72% 24%, rgba(217,180,90,.52), transparent 20%),
+        radial-gradient(circle at 82% 62%, rgba(255,255,255,.22), transparent 18%),
+        radial-gradient(circle at 30% 78%, rgba(217,180,90,.34), transparent 18%);
+      transform: rotate(12deg);
+      pointer-events:none;
+      opacity:.55;
+      animation: twinkle 3.2s ease-in-out infinite;
+    }
+    @keyframes twinkle{
+      0%,100%{ opacity:.45; filter: blur(.1px); }
+      50%{ opacity:.72; filter: blur(.0px); }
+    }
+
+    /* 골드 샤인 라인 */
+    .card:after{
+      content:"";
+      position:absolute;
+      top:-40%;
+      left:-20%;
+      width: 140%;
+      height: 90%;
+      background: linear-gradient(90deg, transparent 20%, rgba(255,233,179,.18) 48%, transparent 72%);
+      transform: rotate(12deg);
+      animation: sweep 4.6s ease-in-out infinite;
+      pointer-events:none;
+      opacity:.9;
+    }
+    @keyframes sweep{
+      0%{ transform: translateX(-30%) rotate(12deg); opacity:.0; }
+      18%{ opacity:.55; }
+      40%{ opacity:.0; }
+      100%{ transform: translateX(30%) rotate(12deg); opacity:.0; }
+    }
+
+    .card .inner{ position:relative; z-index:1; }
+
+    .eventTitle{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      font-size: 12px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: rgba(255,233,179,.92);
+    }
+    .eventTitle:before{
+      content:"✨";
+      filter: drop-shadow(0 8px 18px rgba(255,233,179,.20));
+    }
+
+    .kicker{
+      margin-top: 6px;
+      font-size: 12px;
+      opacity: .9;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.86);
+    }
+    .card h3{
+      margin: 6px 0 10px;
+      font-size: 20px;
+      letter-spacing:-.02em;
+    }
+
+    .balls{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 12px 0 14px;
+    }
+    .ball{
+      width: 46px;
+      height: 46px;
+      border-radius: 999px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight: 900;
+      letter-spacing: .02em;
+
+      /* 골드 링 + 유리느낌 */
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,233,179,.40);
+      box-shadow:
+        inset 0 0 0 2px rgba(217,180,90,.16),
+        0 12px 22px rgba(17,10,19,.28);
+      backdrop-filter: blur(6px);
+    }
+
+    .meta{
+      display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
+      color: rgba(255,255,255,.88);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    .meta .pill{
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,233,179,.24);
+      padding: 7px 10px;
+      border-radius: 999px;
+    }
+
+    .note{
+      margin-top: 12px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,233,179,.18);
+      padding: 12px 12px;
+      border-radius: 14px;
+      font-size: 14px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+    .small{
+      margin-top: 10px;
+      font-size: 12px;
+      color: rgba(255,233,179,.78);
+    }
+
+    .shareBox{ margin-top: 12px; display:grid; gap: 10px; }
+    .shareRow{
+      display:flex;
+      gap:10px;
+      flex-wrap: wrap;
+      align-items:center;
+    }
+    .linkInput{
+      flex:1;
+      min-width: 220px;
+      padding: 11px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(122,16,32,.20);
+      background: rgba(255,255,255,.90);
+      font-size: 13px;
+    }
+
+    .qrWrap{
+      display:flex;
+      gap: 12px;
+      align-items:center;
+      flex-wrap: wrap;
+
+      background: rgba(122,16,32,.04);
+      border: 1px solid rgba(217,180,90,.26);
+      border-radius: 14px;
+      padding: 12px;
+      box-shadow: 0 10px 26px rgba(122,16,32,.10);
+    }
+    .qrBox{
+      width: 140px;
+      height: 140px;
+      border-radius: 14px;
+      background: #fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      border: 2px solid rgba(217,180,90,.40);
+      box-shadow: 0 10px 20px rgba(27,18,32,.12);
+    }
+    .qrBox canvas, .qrBox img{
+      width: 140px !important;
+      height: 140px !important;
+      display:block;
+    }
+    .qrText{
+      flex: 1;
+      min-width: 220px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .hidden{ display:none !important; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div class="title">
+        <h1>마니또 로또번호 카드</h1>
+        <p>번호 입력 → 링크/QR 생성 → 링크 또는 QR로 전달하면 카드 그대로 확인해요.</p>
+      </div>
+      <div class="modeTag" id="modeTag">생성 모드</div>
+    </div>
+
+    <div class="grid">
+      <!-- 생성 패널 -->
+      <section class="panel" id="builderPanel">
+        <div class="hd">
+          <h2>카드 만들기</h2>
+          <span class="badge">1~45 · 중복 금지</span>
+        </div>
+        <div class="bd">
+          <label>로또 번호 6개</label>
+          <div class="nums">
+            <input inputmode="numeric" maxlength="2" placeholder="예) 7" id="n1" />
+            <input inputmode="numeric" maxlength="2" placeholder="예) 14" id="n2" />
+            <input inputmode="numeric" maxlength="2" placeholder="예) 23" id="n3" />
+            <input inputmode="numeric" maxlength="2" placeholder="예) 31" id="n4" />
+            <input inputmode="numeric" maxlength="2" placeholder="예) 39" id="n5" />
+            <input inputmode="numeric" maxlength="2" placeholder="예) 45" id="n6" />
+          </div>
+
+          <div class="btns">
+            <button class="btn ghost" type="button" id="btnRandom">🎲 자동생성</button>
+            <button class="btn warn" type="button" id="btnClear">🧽 초기화</button>
+          </div>
+
+          <div class="row">
+            <div>
+              <label>보내는 사람(마니또)</label>
+              <input placeholder="예) 익명의 마니또 / 슬기 / ㅇㅇ" id="from" />
+            </div>
+            <div>
+              <label>받는 사람(선택)</label>
+              <input placeholder="예) ○○님" id="to" />
+            </div>
+          </div>
+
+          <label>X 소개서 (짧게)</label>
+          <textarea id="intro" maxlength="140" placeholder="예) 장점: 일 잘함 / 단점: 말이 좀 셈 / 특기: 커피로 회유"></textarea>
+          <div class="hint">* 140자 이내 추천. (과몰입 방지용)</div>
+
+          <div class="btns">
+            <button class="btn primary" type="button" id="btnMakeLink">✨ 링크 + QR 만들기</button>
+          </div>
+
+          <div class="error" id="errBox"></div>
+          <div class="ok" id="okBox"></div>
+
+          <div class="shareBox hidden" id="shareBox">
+            <label>공유 링크</label>
+            <div class="shareRow">
+              <input class="linkInput" id="shareLink" readonly />
+              <button class="btn ghost" type="button" id="btnCopyLink">📋 링크 복사</button>
+              <button class="btn ghost" type="button" id="btnShare">📲 공유</button>
+            </div>
+
+            <div class="qrWrap">
+              <div class="qrBox" id="qrBox" aria-label="QR 코드 영역">
+                <span style="font-size:12px;color:#64748b;">QR 준비중</span>
+              </div>
+              <div class="qrText">
+                <b>QR로 전달하기 ✨</b><br/>
+                휴대폰 카메라로 QR을 찍으면 카드 링크로 이동해요.<br/>
+                <span style="font-size:12px;">(사내 게시판/웹페이지에 올린 뒤 URL로 공유하면 가장 안정적)</span>
+              </div>
+            </div>
+
+            <div class="shareRow">
+              <button class="btn ghost" type="button" id="btnCopyText">📝 텍스트 복사</button>
+              <button class="btn ghost" type="button" id="btnOpenAsReceiver">👀 받는 화면으로 보기</button>
+            </div>
+          </div>
+
+          <div class="hint">
+            당첨되면 마니또는 “축하 연락”을 요구할 수 있음(농담).  
+            미당첨이면… 우린 이미 충분히 빛났음.
+          </div>
+        </div>
+      </section>
+
+      <!-- 카드 미리보기/수신 패널 -->
+      <section class="panel" id="cardPanel">
+        <div class="hd">
+          <h2>카드 미리보기</h2>
+          <span class="badge">전달 화면 동일</span>
+        </div>
+        <div class="bd">
+          <div class="card" id="card">
+            <div class="inner">
+              <!-- ✅ 행사 타이틀 고정 -->
+              <div class="eventTitle" id="eventTitle">2025 대주걸즈 송년회</div>
+
+              <div class="kicker">MANITTO SECRET PICK</div>
+              <h3 id="cardTitle">오늘의 행운번호</h3>
+
+              <div class="balls" id="balls">
+                <div class="ball">?</div><div class="ball">?</div><div class="ball">?</div>
+                <div class="ball">?</div><div class="ball">?</div><div class="ball">?</div>
+              </div>
+
+              <div class="meta" id="meta">
+                <div class="pill" id="pillFrom">From: -</div>
+                <div class="pill" id="pillTo">To: -</div>
+              </div>
+
+              <!-- ✅ 메시지 → X 소개서 -->
+              <div class="note" id="cardIntro">X 소개서를 입력하면 여기에 표시돼요.</div>
+              <div class="small" id="stamp">* 재미용 카드 · 부자 되면 연락해(진짜로)</div>
+            </div>
+          </div>
+
+          <div class="btns" style="margin-top:12px;">
+            <button class="btn ghost" type="button" id="btnEditMode">✏️ 생성 모드로</button>
+            <button class="btn ghost" type="button" id="btnReceiverMode">🎁 받은 카드 모드</button>
+          </div>
+
+          <div class="hint" id="receiverHint">
+            “받은 카드 모드”는 링크로 열었을 때처럼 입력폼이 숨겨진 화면이에요.
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+
+  function show(el){ el.classList.remove('hidden'); }
+  function hide(el){ el.classList.add('hidden'); }
+
+  function setMsg(type, text){
+    const err = $('errBox'), ok = $('okBox');
+    err.style.display = 'none';
+    ok.style.display = 'none';
+    if(!text) return;
+    if(type === 'err'){
+      err.textContent = text;
+      err.style.display = 'block';
+    }else{
+      ok.textContent = text;
+      ok.style.display = 'block';
+    }
+  }
+
+  function readNums(){
+    const ids = ['n1','n2','n3','n4','n5','n6'];
+    return ids.map(id => $(id).value.trim()).filter(v => v !== '');
+  }
+
+  function validate(nums){
+    if(nums.length !== 6) return {ok:false, msg:'번호 6개를 모두 입력해줘.'};
+    const parsed = nums.map(v => Number(v));
+    if(parsed.some(n => !Number.isInteger(n))) return {ok:false, msg:'번호는 숫자만 입력해줘.'};
+    if(parsed.some(n => n < 1 || n > 45)) return {ok:false, msg:'번호는 1~45 사이로 입력해줘.'};
+    const set = new Set(parsed);
+    if(set.size !== 6) return {ok:false, msg:'중복된 번호가 있어. 6개 모두 다른 번호로!'};
+    return {ok:true, nums: parsed};
+  }
+
+  function randomPick(){
+    const set = new Set();
+    while(set.size < 6){
+      set.add(1 + Math.floor(Math.random()*45));
+    }
+    return Array.from(set);
+  }
+
+  function updatePreview(numsArr){
+    const balls = $('balls');
+    balls.innerHTML = '';
+    const showNums = (numsArr && numsArr.length===6) ? numsArr : ['?','?','?','?','?','?'];
+    showNums.forEach(n=>{
+      const d = document.createElement('div');
+      d.className = 'ball';
+      d.textContent = n;
+      balls.appendChild(d);
+    });
+
+    const from = $('from').value.trim() || '-';
+    const to = $('to').value.trim() || '-';
+    $('pillFrom').textContent = 'From: ' + from;
+    $('pillTo').textContent = 'To: ' + to;
+
+    const intro = $('intro').value.trim();
+    $('cardIntro').textContent = intro ? intro : 'X 소개서를 입력하면 여기에 표시돼요.';
+  }
+
+  function buildLink(nums, from, to, intro){
+    const url = new URL(window.location.href);
+    const params = new URLSearchParams();
+    params.set('nums', nums.join(','));
+    if(from) params.set('from', from);
+    if(to) params.set('to', to);
+    if(intro) params.set('intro', intro);
+    params.set('view', 'card'); // 수신 모드
+    url.search = params.toString();
+    return url.toString();
+  }
+
+  async function copyToClipboard(text){
+    try{
+      await navigator.clipboard.writeText(text);
+      return true;
+    }catch(e){
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try{
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        return true;
+      }catch(err){
+        document.body.removeChild(ta);
+        return false;
+      }
+    }
+  }
+
+  function setMode(mode){
+    if(mode === 'receive'){
+      hide($('builderPanel'));
+      $('modeTag').textContent = '받은 카드 모드';
+    }else{
+      show($('builderPanel'));
+      $('modeTag').textContent = '생성 모드';
+    }
+  }
+
+  async function renderQR(link){
+    const box = $('qrBox');
+    box.innerHTML = '';
+    if(!window.QRCode || !QRCode.toCanvas){
+      box.innerHTML = '<span style="font-size:12px;color:#64748b;">QR 라이브러리 로드 실패</span>';
+      return;
+    }
+    const canvas = document.createElement('canvas');
+    box.appendChild(canvas);
+    try{
+      await QRCode.toCanvas(canvas, link, {
+        width: 140,
+        margin: 1
+      });
+    }catch(e){
+      box.innerHTML = '<span style="font-size:12px;color:#64748b;">QR 생성 실패</span>';
+    }
+  }
+
+  function applyFromURL(){
+    const sp = new URLSearchParams(window.location.search);
+    const numsStr = sp.get('nums');
+    const from = sp.get('from') || '';
+    const to = sp.get('to') || '';
+    const intro = sp.get('intro') || '';
+    const view = sp.get('view') || '';
+
+    if(from) $('from').value = from;
+    if(to) $('to').value = to;
+    if(intro) $('intro').value = intro;
+
+    if(numsStr){
+      const parts = numsStr.split(',').map(s=>s.trim()).filter(Boolean);
+      const ids = ['n1','n2','n3','n4','n5','n6'];
+      ids.forEach((id, i)=> $(id).value = parts[i] || '');
+      const val = validate(parts);
+      if(val.ok){
+        updatePreview(val.nums);
+        if(view === 'card') setMode('receive');
+      }else{
+        updatePreview(null);
+      }
+    }else{
+      updatePreview(null);
+    }
+  }
+
+  ['n1','n2','n3','n4','n5','n6','from','to','intro'].forEach(id=>{
+    $(id).addEventListener('input', ()=>{
+      const nums = readNums();
+      const v = validate(nums);
+      updatePreview(v.ok ? v.nums : null);
+    });
+  });
+
+  $('btnRandom').addEventListener('click', ()=>{
+    const pick = randomPick();
+    const ids = ['n1','n2','n3','n4','n5','n6'];
+    ids.forEach((id, i)=> $(id).value = pick[i]);
+    updatePreview(pick);
+    setMsg('ok', '랜덤 번호 생성 완료! 이제 링크 + QR 만들기만 누르면 돼.');
+  });
+
+  $('btnClear').addEventListener('click', ()=>{
+    ['n1','n2','n3','n4','n5','n6','to','intro'].forEach(id=> $(id).value = '');
+    updatePreview(null);
+    setMsg('', '');
+    hide($('shareBox'));
+    $('qrBox').innerHTML = '<span style="font-size:12px;color:#64748b;">QR 준비중</span>';
+  });
+
+  $('btnMakeLink').addEventListener('click', async ()=>{
+    const nums = readNums();
+    const v = validate(nums);
+    if(!v.ok){
+      setMsg('err', v.msg);
+      hide($('shareBox'));
+      return;
+    }
+    setMsg('', '');
+    const from = $('from').value.trim();
+    const to = $('to').value.trim();
+    const intro = $('intro').value.trim();
+    const link = buildLink(v.nums, from, to, intro);
+
+    $('shareLink').value = link;
+    show($('shareBox'));
+    await renderQR(link);
+    setMsg('ok', '공유 링크 + QR 생성 완료! 링크 또는 QR로 전달하면 돼.');
+  });
+
+  $('btnCopyLink').addEventListener('click', async ()=>{
+    const link = $('shareLink').value;
+    if(!link) return;
+    const ok = await copyToClipboard(link);
+    setMsg(ok ? 'ok' : 'err', ok ? '링크 복사 완료!' : '복사 실패. 링크를 직접 드래그해서 복사해줘.');
+  });
+
+  $('btnCopyText').addEventListener('click', async ()=>{
+    const nums = readNums();
+    const v = validate(nums);
+    const from = $('from').value.trim() || '익명의 마니또';
+    const to = $('to').value.trim() || '너';
+    const intro = $('intro').value.trim();
+
+    const text =
+`[2025 대주걸즈 송년회 | 마니또 로또번호 카드]
+To: ${to}
+From: ${from}
+번호: ${(v.ok ? v.nums.join(', ') : nums.join(', '))}
+X 소개서: ${intro ? intro : '(없음)'}
+`;
+    const ok = await copyToClipboard(text);
+    setMsg(ok ? 'ok' : 'err', ok ? '텍스트 복사 완료!' : '복사 실패. 브라우저 권한을 확인해줘.');
+  });
+
+  $('btnShare').addEventListener('click', async ()=>{
+    const link = $('shareLink').value;
+    if(!link){ setMsg('err','먼저 링크 + QR를 만들어줘.'); return; }
+
+    if(navigator.share){
+      try{
+        await navigator.share({
+          title: '2025 대주걸즈 송년회 | 마니또 로또번호 카드',
+          text: '✨ 마니또가 점지한 행운번호 도착! (QR도 가능)',
+          url: link
+        });
+        setMsg('ok','공유 완료!');
+      }catch(e){
+        setMsg('', '');
+      }
+    }else{
+      const ok = await copyToClipboard(link);
+      setMsg(ok ? 'ok' : 'err', ok ? '공유 기능이 없어 링크를 복사했어!' : '복사 실패. 링크를 직접 복사해줘.');
+    }
+  });
+
+  $('btnOpenAsReceiver').addEventListener('click', ()=>{
+    const link = $('shareLink').value;
+    if(!link){ setMsg('err','먼저 링크 + QR를 만들어줘.'); return; }
+    window.open(link, '_blank');
+  });
+
+  $('btnEditMode').addEventListener('click', ()=> setMode('build'));
+  $('btnReceiverMode').addEventListener('click', ()=> setMode('receive'));
+
+  applyFromURL();
+</script>
+</body>
+</html>
